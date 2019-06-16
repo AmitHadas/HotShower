@@ -1,0 +1,78 @@
+package HandleClient
+
+import (
+	"HotShower/Database"
+	"fmt"
+	"net"
+	"strconv"
+)
+
+const (
+	OFF    		int = 0
+	ON    		int = 1
+)
+
+func HandleNewUser(conn net.Conn, userName string, pass string){
+	if !Database.UserExists(userName){
+
+		boilerId := ReadNumberFromClient(conn)
+		desiredTemp := ReadNumberFromClient(conn)
+		maxTemp := ReadNumberFromClient(conn)
+
+		newUser := Database.User{userName, pass, boilerId}
+		Database.AddNewUser(newUser, desiredTemp, maxTemp)
+	}
+}
+
+func SetConfiguration (conn net.Conn, userName string, pass string){
+	if !Database.UserExists(userName){
+		fmt.Println("User does not exist!")
+		conn.Close()
+	}
+	desiredTemp := ReadNumberFromClient(conn)
+	maxTemp := ReadNumberFromClient(conn)
+
+	boiler := Database.GetBoilerByUserName(string(userName), string(pass))
+	boiler.Max_Temp = maxTemp
+	boiler.Desired_Temp = desiredTemp
+
+	/**
+	now need to open connection with boiler and send new configurations. Didn't implement in this assignment.
+	 */
+}
+
+func ControlBoilerConditions (conn net.Conn, userName string, pass string){
+	if !Database.UserExists(userName){
+		fmt.Println("User does not exist!")
+		conn.Close()
+	}
+	newState := ReadNumberFromClient(conn)
+	boiler := Database.GetBoilerByUserName(string(userName), string(pass))
+
+	// only to prevent compilation errors
+	fmt.Println(newState)
+	fmt.Println(boiler)
+
+	/**
+	now need to open connection with boiler and send new state (on\off). Didn't implement in this assignment.
+	 */
+}
+
+func ReadNumberFromClient(conn net.Conn) int{
+	buff := make([]byte, 64)
+
+	// Get User name
+	_ , err := conn.Read(buff)
+	if err != nil {
+	CloseConnection(conn, "Error reading from user:", err)
+	return -1
+	}
+
+	res, err := strconv.Atoi(string(buff))
+
+	if err != nil{
+		CloseConnection(conn, "Error reading from user:", err)
+		return -1
+	}
+	return res
+}
