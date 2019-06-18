@@ -78,7 +78,7 @@ func ReadNumberFromClient(conn net.Conn) int{
 	return res
 }
 
-func GetHotWaterInMinutes(conn net.Conn, userName string, password string) int {
+func GetHotWaterInMinutes(conn net.Conn, userName string, password string){
 	/**
 	Assume that boiler thermostat is able to send number of liters of hot water,
 	and the amount of water flowing through the faucet.
@@ -86,5 +86,7 @@ func GetHotWaterInMinutes(conn net.Conn, userName string, password string) int {
 	and send the result after calculations.
  	 */
 
- 	 return rand.Int()
+ 	 res := rand.Int()
+ 	 resBuff := []byte(strconv.Itoa(res))
+ 	 conn.Write(resBuff)
 }
