@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	NewUser    		int = 0
-	SetConf    		int = 1
-	ControlBoiler   int = 2
+	NewUser    			int = 0
+	SetConf    			int = 1
+	ControlBoiler   	int = 2
+	HotWaterInMinutes	int = 3
 )
 
 func getRequest(conn net.Conn) {
@@ -92,6 +93,8 @@ func RecieveRequest(conn net.Conn) {
 		SetConfiguration(conn, userName, password)
 	case ControlBoiler:
 		ControlBoilerConditions(conn, userName, password)
+	case HotWaterInMinutes:
+		GetHotWaterInMinutes(conn, userName, password)
 	default:
 		conn.Close()
 	}

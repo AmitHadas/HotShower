@@ -3,6 +3,7 @@ package HandleClient
 import (
 	"HotShower/Database"
 	"fmt"
+	"math/rand"
 	"net"
 	"strconv"
 )
@@ -75,4 +76,15 @@ func ReadNumberFromClient(conn net.Conn) int{
 		return -1
 	}
 	return res
+}
+
+func GetHotWaterInMinutes(conn net.Conn, userName string, password string) int {
+	/**
+	Assume that boiler thermostat is able to send number of liters of hot water,
+	and the amount of water flowing through the faucet.
+	The server will open a connection with the thermostat app, receive the needed information
+	and send the result after calculations.
+ 	 */
+
+ 	 return rand.Int()
 }
