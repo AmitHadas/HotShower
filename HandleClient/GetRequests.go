@@ -14,17 +14,13 @@ const (
 	HotWaterInMinutes	int = 3
 )
 
-func getRequest(conn net.Conn) {
+func ReceiveRequest(conn net.Conn) {
 	fmt.Println("New client connected to server!")
 	//bufferFileName := make([]byte, 64)
 	UserName := make([]byte, 64)
 	Password := make([]byte, 64)
 	RequestTypeBuff := make([]byte, 10)
-	RequestType, error1 := strconv.Atoi(string(RequestTypeBuff))
-	if error1 != nil {
-		CloseConnection(conn, "Error reading RequestType from user:", error1)
-		return
-	}
+
 	// Get User name
 	_, err := conn.Read(UserName)
 	if err != nil {
@@ -43,48 +39,17 @@ func getRequest(conn net.Conn) {
 
 	password := strings.Split(string(Password), "\n")[0]
 
-	switch RequestType {
-	case NewUser:
-		HandleNewUser(conn, userName, password)
-	case SetConf:
-		SetConfiguration(conn, userName, password)
-	case ControlBoiler:
-		ControlBoilerConditions(conn, userName, password)
-	default:
-		conn.Close()
+	// Get Request type
+	_, err = conn.Read(RequestTypeBuff)
+	if err != nil {
+		CloseConnection(conn, "Error reading request type from user:", err)
+		return
 	}
-
-	defer conn.Close()
-}
-
-func RecieveRequest(conn net.Conn) {
-	fmt.Println("New client connected to server!")
-	//bufferFileName := make([]byte, 64)
-	UserName := make([]byte, 64)
-	Password := make([]byte, 64)
-	RequestTypeBuff := make([]byte, 10)
 	RequestType, error1 := strconv.Atoi(string(RequestTypeBuff))
 	if error1 != nil {
-		CloseConnection(conn, "Error reading RequestType from user:", error1)
+		CloseConnection(conn, "Error converting RequestType:", error1)
 		return
 	}
-	// Get User name
-	_, err := conn.Read(UserName)
-	if err != nil {
-		CloseConnection(conn, "Error reading user name from user:", err)
-		return
-	}
-
-	userName := strings.Split(string(UserName), "\n")[0]
-
-	// Get Password
-	_, err = conn.Read(Password)
-	if err != nil {
-		CloseConnection(conn, "Error reading password from user:", err)
-		return
-	}
-
-	password := strings.Split(string(Password), "\n")[0]
 
 	switch RequestType {
 	case NewUser:
@@ -96,14 +61,22 @@ func RecieveRequest(conn net.Conn) {
 	case HotWaterInMinutes:
 		GetHotWaterInMinutes(conn, userName, password)
 	default:
-		conn.Close()
+		err = conn.Close()
+		if err != nil {
+			fmt.Println("Close connection failed", err)
+			return
+		}
+
 	}
 
 	defer conn.Close()
-
 }
 
 func CloseConnection(conn net.Conn, errMsg string, err error) {
 	fmt.Println(errMsg, err.Error())
-	conn.Close()
+	err = conn.Close()
+	if err != nil {
+		fmt.Println("Close connection failed", err)
+		return
+	}
 }

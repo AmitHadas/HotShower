@@ -1,44 +1,44 @@
 package Database
 
 type Boiler struct {
-	ID 				int
-	Desired_Temp	int
-	Max_Temp    	int
+	ID          int
+	DesiredTemp int
+	MaxTemp     int
 }
 
 type User struct {
-	User_Name 	string
-	Pass    	string
-	Boiler_ID   int
+	UserName string
+	Pass     string
+	BoilerID int
 }
 
 var UserMap = make(map[string]User)
 var BoilerMap = make(map[int]Boiler)
 
-func AddNewBoiler(boiler_id int, desired_temp int, max_temp int){
-	newBoiler := Boiler{boiler_id, desired_temp, max_temp}
-	BoilerMap[boiler_id] = newBoiler
+func AddNewBoiler(boilerId int, desiredTemp int, maxTemp int){
+	newBoiler := Boiler{boilerId, desiredTemp, maxTemp}
+	BoilerMap[boilerId] = newBoiler
 }
 
-func AddNewUser(user User, desired_temp int, max_temp int) {
-	UserMap[user.User_Name] = user
-	boiler, ok := BoilerMap[user.Boiler_ID]
+func AddNewUser(user User, desiredTemp int, maxTemp int) {
+	UserMap[user.UserName] = user
+	boiler, ok := BoilerMap[user.BoilerID]
 	if !ok {
-		AddNewBoiler(user.Boiler_ID, desired_temp, max_temp)
+		AddNewBoiler(user.BoilerID, desiredTemp, maxTemp)
 	} else {
-		boiler.Desired_Temp = desired_temp
-		boiler.Max_Temp = max_temp
+		boiler.DesiredTemp = desiredTemp
+		boiler.MaxTemp = maxTemp
 	}
 }
 
 func GetBoilerByUserName(userName string, pass string) *Boiler {
 
-	user, valid_user := UserMap[userName]
-	if valid_user {
+	user, validUser := UserMap[userName]
+	if validUser {
 		if user.Pass == pass {
-			boiler, valid_boiler := BoilerMap[user.Boiler_ID]
+			boiler, validBoiler := BoilerMap[user.BoilerID]
 
-			if valid_boiler {
+			if validBoiler {
 				return &boiler
 			}
 		}
@@ -47,8 +47,8 @@ func GetBoilerByUserName(userName string, pass string) *Boiler {
 }
 
 func UserExists(userName string) bool {
-	_, valid_user := UserMap[userName]
-	if valid_user{
+	_, validUser := UserMap[userName]
+	if validUser {
 		return true
 	}
 	return false

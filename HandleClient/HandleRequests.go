@@ -34,8 +34,8 @@ func SetConfiguration (conn net.Conn, userName string, pass string){
 	maxTemp := ReadNumberFromClient(conn)
 
 	boiler := Database.GetBoilerByUserName(string(userName), string(pass))
-	boiler.Max_Temp = maxTemp
-	boiler.Desired_Temp = desiredTemp
+	boiler.MaxTemp = maxTemp
+	boiler.DesiredTemp = desiredTemp
 
 	/**
 	now need to open connection with boiler and send new configurations. Didn't implement in this assignment.
@@ -88,5 +88,9 @@ func GetHotWaterInMinutes(conn net.Conn, userName string, password string){
 
  	 res := rand.Int()
  	 resBuff := []byte(strconv.Itoa(res))
- 	 conn.Write(resBuff)
+ 	 _, err := conn.Write(resBuff)
+ 	 if err != nil {
+		fmt.Println("Writing failed", err)
+		return
+	}
 }
